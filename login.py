@@ -1,5 +1,6 @@
 from tkinter import *
 import os
+import psycopg2
 
 def main_account_screen():
 
@@ -165,17 +166,83 @@ def login_verify():
 
 def login_sucess():
     global login_success_screen   # make login_success_screen global
+    global cursor
     login_success_screen = Toplevel(login_screen)
-    login_success_screen.title("Success")
-    login_success_screen.geometry("150x100")
-    Label(login_success_screen, text="Login Success").pack()
 
-    # create OK button
-    Button(login_success_screen, text="OK", command=delete_login_success).pack()
+    ## Connecion a base de datos
+    try:
+        connection = psycopg2.connect(user = "postgres",
+                                  password = "postgres",
+                                  host = "localhost",
+                                  port = "5432",
+                                  database = "intento2")
+
+        cursor = connection.cursor()
+        # Print PostgreSQL Connection properties
+        print ( connection.get_dsn_parameters(),"\n")
+
+        # Print PostgreSQL version
+        cursor.execute("SELECT version();")
+        record = cursor.fetchone()
+        print("You are connected to - ", record,"\n")
 
 
-def delete_login_success():
-    login_success_screen.destroy()
+        #Background Color
+        login_success_screen.title('Bases de Datos')
+        login_success_screen.configure(background = 'black')
+        login_success_screen.geometry("2000x1500")
+
+        ## CREAR IMAGEN
+        foto = PhotoImage(file = "header.png")
+        label2 = Label(login_success_screen, image = foto)
+        label2.image =foto
+        label2.place(x=90, y =0)
+
+        #ingresar search
+        global entry1
+        entry1 = Entry(login_success_screen)
+        entry1.place(x=120, y= 260)
+        button1 = Button(login_success_screen, text="Search", command = searchmusic)
+        button1.place(x =120, y= 290)
+
+
+        ##Botones para hacer search
+        global var
+        var = IntVar()
+        Radiobutton(login_success_screen, text="Artist    ", variable=var, value=1,fg='white', bg='black').place(x=5, y=260)
+        Radiobutton(login_success_screen, text="Genre   ", variable=var, value=2,fg='white' , bg='black').place(x=5, y=280)
+        Radiobutton(login_success_screen, text="Canción", variable=var, value=3,fg='white', bg='black').place(x=5, y=300)
+        Radiobutton(login_success_screen, text="Playlist  ", variable=var, value=4,fg='white', bg='black').place(x=5, y=320)
+        Radiobutton(login_success_screen, text="Album   ", variable=var, value=5,fg='white', bg='black').place(x=5, y=340)
+
+
+    except(Exception, psycopg2.Error) as error :
+        print ("Error while connecting to PostgreSQL", error)
+
+
+
+def searchmusic ():
+    select = var.get()
+    if select == 1:
+        selection = 'artist'
+    if select == 2:
+        selection = 'genre'
+    if select == 3:
+        selection = 'track'
+    if select == 4:
+        selection = 'playlist'
+    if select == 5:
+        selection = 'album'
+    x1 = entry1.get()
+    querry= "select '" +x1+"' from "+selection+" LIMIT 10"
+    querry =str(querry)
+    postgreSQL_select_Query = querry
+    cursor.execute(postgreSQL_select_Query)
+    records = cursor.fetchall()
+    records1=Label(login_success_screen, text=records, fg = 'white', bg='black')
+    records1.place(x= 500, y = 300)
+
+
 
 def password_not_recognised():
     global password_not_recog_screen
