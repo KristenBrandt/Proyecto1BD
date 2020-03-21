@@ -172,10 +172,10 @@ def login_sucess():
     ## Connecion a base de datos
     try:
         connection = psycopg2.connect(user = "postgres",
-                                  password = "postgres",
-                                  host = "localhost",
-                                  port = "5432",
-                                  database = "intento2")
+                                      password = "postgres",
+                                      host = "localhost",
+                                      port = "5432",
+                                      database = "intento2")
 
         cursor = connection.cursor()
         # Print PostgreSQL Connection properties
@@ -212,8 +212,7 @@ def login_sucess():
         Radiobutton(login_success_screen, text="Artist    ", variable=var, value=1,fg='white', bg='black').place(x=5, y=260)
         Radiobutton(login_success_screen, text="Genre   ", variable=var, value=2,fg='white' , bg='black').place(x=5, y=280)
         Radiobutton(login_success_screen, text="Canción", variable=var, value=3,fg='white', bg='black').place(x=5, y=300)
-        Radiobutton(login_success_screen, text="Playlist  ", variable=var, value=4,fg='white', bg='black').place(x=5, y=320)
-        Radiobutton(login_success_screen, text="Album   ", variable=var, value=5,fg='white', bg='black').place(x=5, y=340)
+        Radiobutton(login_success_screen, text="Album   ", variable=var, value=5,fg='white', bg='black').place(x=5, y=320)
 
 
     except(Exception, psycopg2.Error) as error :
@@ -223,22 +222,31 @@ def login_sucess():
 
 def searchmusic ():
     select = var.get()
-    if select == 1:
-        selection = 'artist'
-    if select == 2:
-        selection = 'genre'
-    if select == 3:
-        selection = 'track'
-    if select == 4:
-        selection = 'playlist'
-    if select == 5:
-        selection = 'album'
     x1 = entry1.get()
-    querry= "select '" +x1+"' from "+selection+" LIMIT 10"
+    x2 = 'artist.name, track.name'
+    whereclause = ''
+    if select == 1:
+        selection = 'track INNER JOIN album ON track.albumid = album.albumid INNER JOIN artist ON album.artistid = artist.artistid'
+        whereclause = "artist.name='"+x1+"'"
+    if select == 2:
+        selection = 'track INNER JOIN genre ON genre.genreid = track.genreid INNER JOIN album ON track.albumid = album.albumid INNER JOIN artist ON album.artistid = artist.artistid'
+        whereclause = "genre.name='" +x1+ "'"
+        x2 = 'genre.name, artist.name, track.name'
+    if select == 3:
+        selection = 'track INNER JOIN album ON track.albumid = album.albumid INNER JOIN artist ON album.artistid = artist.artistid'
+        whereclause = "track.name='"+x1+ "'"
+        x2= 'artist.name, track.name, album.title'
+    if select == 5:
+        selection = 'track INNER JOIN album ON track.albumid = album.albumid INNER JOIN artist ON album.artistid = artist.artistid'
+        whereclause = " album.title='"+x1+"'"
+    querry= "select " +x2+" from "+selection+" WHERE "+whereclause+" LIMIT 10"
     querry =str(querry)
+    print(querry)
     postgreSQL_select_Query = querry
     cursor.execute(postgreSQL_select_Query)
     records = cursor.fetchall()
+    for record in records:
+        print(records)
     records1=Label(login_success_screen, text=records, fg = 'white', bg='black')
     records1.place(x= 500, y = 300)
 
