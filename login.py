@@ -2,6 +2,8 @@ from tkinter import *
 import os
 import psycopg2
 
+## codigo para el login tomado de https://www.simplifiedpython.net/python-gui-login/
+
 def main_account_screen():
 
     global main_screen
@@ -32,11 +34,6 @@ def register():
     global password
     global username_entry
     global password_entry
-
-    # The Toplevel widget work pretty much like Frame,
-    # but it is displayed in a separate, top-level window.
-    #Such windows usually have title bars, borders, and other “window decorations”.
-    # And in argument we have to pass global screen variable
 
     register_screen = Toplevel(main_screen)
     register_screen.title("Register")
@@ -152,16 +149,14 @@ def login_verify():
     #defining verification's conditions
     if username1 in list_of_files:
         file1 = open(username1, "r")   # open the file in read mode
-
-        #read the file,
-        #as splitlines() actually splits on the newline character,
-        #the newline character is not left hanging at the end of each line. if password1 in verify:
-
         verify = file1.read().splitlines()
-        login_sucess()
+        if password1 in verify:
+            login_sucess()
+        else:
+            password_not_recognised()
 
     else:
-        password_not_recognised()
+        user_not_found()
 
 
 def login_sucess():
@@ -236,9 +231,11 @@ def searchmusic ():
         selection = 'track INNER JOIN album ON track.albumid = album.albumid INNER JOIN artist ON album.artistid = artist.artistid'
         whereclause = "track.name='"+x1+ "'"
         x2= 'artist.name, track.name, album.title'
+        records = cursor.fetchall()
     if select == 5:
         selection = 'track INNER JOIN album ON track.albumid = album.albumid INNER JOIN artist ON album.artistid = artist.artistid'
         whereclause = " album.title='"+x1+"'"
+
     querry= "select " +x2+" from "+selection+" WHERE "+whereclause+" LIMIT 10"
     querry =str(querry)
     print(querry)
@@ -246,7 +243,8 @@ def searchmusic ():
     cursor.execute(postgreSQL_select_Query)
     records = cursor.fetchall()
     for record in records:
-        print(records)
+        print(record)
+
     records1=Label(login_success_screen, text=records, fg = 'white', bg='black')
     records1.place(x= 500, y = 300)
 
