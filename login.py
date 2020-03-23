@@ -199,6 +199,8 @@ def login_sucess():
         entry1.place(x=120, y= 260)
         button1 = Button(login_success_screen, text="Search", command = searchmusic)
         button1.place(x =120, y= 290)
+        button2 = Button(login_success_screen,text='Reportes interesantes', command= reportes)
+        button2.place(x=1150, y=750)
 
 
         ##Botones para hacer search
@@ -213,6 +215,35 @@ def login_sucess():
     except(Exception, psycopg2.Error) as error :
         print ("Error while connecting to PostgreSQL", error)
 
+def reportes():
+    global reportes_screen
+    reportes_screen = Toplevel(login_screen)
+    reportes_screen.title("Reportes")
+    reportes_screen.geometry("2000x1500")
+    reportes_screen.configure(background = 'black')
+    ## CREAR IMAGEN
+    foto = PhotoImage(file = "logo.png")
+    label2 = Label(reportes_screen, image = foto)
+    label2.image =foto
+    label2.place(x=5,y=5)
+
+    Label1 = Label(reportes_screen,text="Los artistas con más álbumes publicados")
+    Label1.pack()
+    Label2 =Label(reportes_screen,text="Géneros con más canciones")
+    Label2.pack()
+    Label3 = Label(reportes_screen,text="Total de duración de cada playlist")
+    Label3.pack()
+    Label4 = Label(reportes_screen,text="Canciones de mayor duración con la información de sus artistas")
+    Label4.pack()
+    Label5 = Label(reportes_screen,text="Usuarios que han registrado más canciones")
+    Label5.pack()
+    Label6 = Label(reportes_screen,text="Promedio de duración de canciones por género")
+    Label6.pack()
+    Label7 = Label(reportes_screen,text="Cantidad de artistas diferentes por playlist")
+    Label7.pack()
+    Label8 = Label(reportes_screen,text="Los artistas con más diversidad de géneros musicales")
+    Label8.pack()
+
 
 
 def searchmusic ():
@@ -223,30 +254,83 @@ def searchmusic ():
     if select == 1:
         selection = 'track INNER JOIN album ON track.albumid = album.albumid INNER JOIN artist ON album.artistid = artist.artistid'
         whereclause = "artist.name='"+x1+"'"
+        querry= "select " +x2+" from "+selection+" WHERE "+whereclause+" LIMIT 10"
+        querry =str(querry)
+        print(querry)
+        postgreSQL_select_Query = querry
+        cursor.execute(postgreSQL_select_Query)
+        records = cursor.fetchall()
+
+        hola = ""
+        for record in records:
+            print(record[0],record[1])
+            hola = hola + record[0]+": "+record[1]+"\n"
+            print(type(record))
+
+        print(hola)
+        records1=Label(login_success_screen, text=hola, fg = 'white', bg='black')
+        records1.place(x= 500, y = 300)
     if select == 2:
         selection = 'track INNER JOIN genre ON genre.genreid = track.genreid INNER JOIN album ON track.albumid = album.albumid INNER JOIN artist ON album.artistid = artist.artistid'
         whereclause = "genre.name='" +x1+ "'"
         x2 = 'genre.name, artist.name, track.name'
+        querry= "select " +x2+" from "+selection+" WHERE "+whereclause+" LIMIT 10"
+        querry =str(querry)
+        print(querry)
+        postgreSQL_select_Query = querry
+        cursor.execute(postgreSQL_select_Query)
+        records = cursor.fetchall()
+
+        hola = ""
+        for record in records:
+            print(record[0],record[1],record[2])
+            hola = hola + record[0]+": "+record[1]+" "+record[2]+"\n"
+            print(type(record))
+
+        print(hola)
+        records1=Label(login_success_screen, text=hola, fg = 'white', bg='black')
+        records1.place(x= 500, y = 300)
     if select == 3:
         selection = 'track INNER JOIN album ON track.albumid = album.albumid INNER JOIN artist ON album.artistid = artist.artistid'
         whereclause = "track.name='"+x1+ "'"
         x2= 'artist.name, track.name, album.title'
         records = cursor.fetchall()
+        querry= "select " +x2+" from "+selection+" WHERE "+whereclause+" LIMIT 10"
+        querry =str(querry)
+        print(querry)
+        postgreSQL_select_Query = querry
+        cursor.execute(postgreSQL_select_Query)
+        records = cursor.fetchall()
+
+        hola = ""
+        for record in records:
+            print(record[0],record[1])
+            hola = hola + record[0]+": "+record[1]+"\n"
+            print(type(record))
+
+        print(hola)
+        records1=Label(login_success_screen, text=hola, fg = 'white', bg='black')
+        records1.place(x= 500, y = 300)
     if select == 5:
         selection = 'track INNER JOIN album ON track.albumid = album.albumid INNER JOIN artist ON album.artistid = artist.artistid'
         whereclause = " album.title='"+x1+"'"
+        records = cursor.fetchall()
+        querry= "select " +x2+" from "+selection+" WHERE "+whereclause+" LIMIT 10"
+        querry =str(querry)
+        print(querry)
+        postgreSQL_select_Query = querry
+        cursor.execute(postgreSQL_select_Query)
+        records = cursor.fetchall()
 
-    querry= "select " +x2+" from "+selection+" WHERE "+whereclause+" LIMIT 10"
-    querry =str(querry)
-    print(querry)
-    postgreSQL_select_Query = querry
-    cursor.execute(postgreSQL_select_Query)
-    records = cursor.fetchall()
-    for record in records:
-        print(record)
+        hola = ""
+        for record in records:
+            print(record[0],record[1])
+            hola = hola + record[0]+": "+record[1]+"\n"
+            print(type(record))
 
-    records1=Label(login_success_screen, text=records, fg = 'white', bg='black')
-    records1.place(x= 500, y = 300)
+        print(hola)
+        records1=Label(login_success_screen, text=hola, fg = 'white', bg='black')
+        records1.place(x= 500, y = 300)
 
 
 
