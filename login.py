@@ -221,29 +221,132 @@ def reportes():
     reportes_screen.title("Reportes")
     reportes_screen.geometry("2000x1500")
     reportes_screen.configure(background = 'black')
-    ## CREAR IMAGEN
-    foto = PhotoImage(file = "logo.png")
-    label2 = Label(reportes_screen, image = foto)
-    label2.image =foto
-    label2.place(x=5,y=5)
 
     Label1 = Label(reportes_screen,text="Los artistas con más álbumes publicados")
-    Label1.pack()
-    Label2 =Label(reportes_screen,text="Géneros con más canciones")
-    Label2.pack()
-    Label3 = Label(reportes_screen,text="Total de duración de cada playlist")
-    Label3.pack()
-    Label4 = Label(reportes_screen,text="Canciones de mayor duración con la información de sus artistas")
-    Label4.pack()
-    Label5 = Label(reportes_screen,text="Usuarios que han registrado más canciones")
-    Label5.pack()
-    Label6 = Label(reportes_screen,text="Promedio de duración de canciones por género")
-    Label6.pack()
-    Label7 = Label(reportes_screen,text="Cantidad de artistas diferentes por playlist")
-    Label7.pack()
-    Label8 = Label(reportes_screen,text="Los artistas con más diversidad de géneros musicales")
-    Label8.pack()
+    Label1.pack(anchor= 'nw')
+    querry = "SELECT artist.name, COUNT(*) AS numero_de_discos FROM album INNER JOIN artist ON album.artistid = artist.artistid GROUP BY album.artistid, artist.name ORDER BY COUNT(*) DESC LIMIT 5"
+    postgreSQL_select_Query = querry
+    cursor.execute(postgreSQL_select_Query)
+    records = cursor.fetchall()
+    hola = ""
+    for record in records:
+        print(record[0],record[1])
+        numero = str(record[1])
+        hola = hola + record[0]+": "+numero +" albums\n"
+        print(type(record))
 
+    print(hola)
+    records1=Label(reportes_screen, text=hola, fg = 'white', bg='black')
+    records1.pack(anchor= 'nw')
+
+
+    Label2 =Label(reportes_screen,text="Géneros con más canciones")
+    Label2.pack(anchor= 'nw')
+    querry2 = "SELECT genre.name, COUNT(*) AS numero_de_canciones FROM track INNER JOIN genre ON genre.genreid = track.genreid GROUP BY genre.name ORDER BY numero_de_canciones DESC LIMIT 5"
+    postgreSQL_select_Query = querry2
+    cursor.execute(postgreSQL_select_Query)
+    records2 = cursor.fetchall()
+    adios = ""
+    for record in records2:
+        print(record[0],record[1])
+        numero = str(record[1])
+        adios = adios + record[0]+": "+numero +" canciones\n"
+        print(type(record))
+
+    print(adios)
+    records2=Label(reportes_screen, text=adios, fg = 'white', bg='black')
+    records2.pack(anchor= 'nw')
+    Label3 = Label(reportes_screen,text="Total de duración de cada playlist")
+    Label3.pack(anchor= 'nw')
+    querry3 ="SELECT playlist.name, SUM(track.milliseconds/60000) AS duracion_minutos FROM track INNER JOIN playlisttrack ON playlisttrack.trackid = track.trackid INNER JOIN playlist ON playlisttrack.playlistid = playlist.playlistid GROUP BY playlist.name ORDER BY duracion_minutos DESC"
+    postgreSQL_select_Query = querry3
+    cursor.execute(postgreSQL_select_Query)
+    records3 = cursor.fetchall()
+    what = ""
+    for record in records3:
+        print(record[0],record[1])
+        numero = str(record[1])
+        what = what + record[0]+": "+numero +" minutos\n"
+        print(type(record))
+
+    print(adios)
+    records3=Label(reportes_screen, text=what, fg = 'white', bg='black')
+    records3.pack(anchor= 'nw')
+
+    Label4 = Label(reportes_screen,text="Canciones de mayor duración con la información de sus artistas")
+    Label4.pack(anchor= 'nw')
+    querry4= "SELECT track.name, artist.name, track.milliseconds/60000 AS duracion_minutos FROM track INNER JOIN album ON track.albumid = album.albumid INNER JOIN artist ON album.artistid = artist.artistid ORDER BY duracion_minutos DESC LIMIT 5"
+    postgreSQL_select_Query = querry4
+    cursor.execute(postgreSQL_select_Query)
+    records4 = cursor.fetchall()
+    who = ""
+    for record in records4:
+        print(record[0],record[1],record[2])
+        numero = str(record[2])
+        who = who + "Track: "+record[0]+" Artist: "+record[1]+" "+numero +" minutos\n"
+        print(type(record))
+
+    print(adios)
+    records4=Label(reportes_screen, text=who, fg = 'white', bg='black')
+    records4.pack(anchor= 'nw')
+
+##@ TODO
+    Label5 = Label(reportes_screen,text="Usuarios que han registrado más canciones")
+    Label5.place(x= 550, y=0)
+
+
+    Label6 = Label(reportes_screen,text="Promedio de duración de canciones por género")
+    Label6.place(x=550,y=300)
+    querry6 = "SELECT genre.name, AVG(track.milliseconds/60000) AS promedio_duracion_minutos FROM track INNER JOIN genre ON genre.genreid = track.genreid GROUP BY genre.name ORDER BY promedio_duracion_minutos DESC"
+    postgreSQL_select_Query = querry6
+    cursor.execute(postgreSQL_select_Query)
+    records6 = cursor.fetchall()
+    ask = ""
+    for record in records6:
+        print(record[0],record[1])
+        numero = str(record[1])
+        ask = ask +record[0]+" "+numero +" minutos\n"
+        print(type(record))
+
+    print(ask)
+    records6=Label(reportes_screen, text=ask, fg = 'white', bg='black')
+    records6.place(x= 550, y=320)
+
+
+    Label7 = Label(reportes_screen,text="Cantidad de artistas diferentes por playlist")
+    Label7.place(x=1150, y=0)
+    querry7 = "SELECT playlist.name, COUNT(DISTINCT artist.name) AS numero_artistas FROM track INNER JOIN album ON track.albumid=album.albumid INNER JOIN artist ON artist.artistid = album.artistid INNER JOIN playlisttrack ON playlisttrack.trackid = track.trackid INNER JOIN playlist ON playlist.playlistid = playlisttrack.playlistid GROUP BY playlist.name ORDER BY numero_artistas DESC"
+    postgreSQL_select_Query = querry7
+    cursor.execute(postgreSQL_select_Query)
+    records7 = cursor.fetchall()
+    loco = ""
+    for record in records7:
+        print(record[0],record[1])
+        numero = str(record[1])
+        loco = loco +record[0]+" "+numero +" minutos\n"
+        print(type(record))
+
+    print(loco)
+    records7=Label(reportes_screen, text=loco, fg = 'white', bg='black')
+    records7.place(x=1150, y=25)
+
+
+    Label8 = Label(reportes_screen,text="Los artistas con más diversidad de géneros musicales")
+    Label8.place(x=1100,y= 400)
+    querry8 ="SELECT artist.name, COUNT(DISTINCT genre.name) AS numero_generos FROM track JOIN album ON album.albumid = track.albumid JOIN artist ON album.artistid = artist.artistid JOIN genre ON track.genreid = genre.genreid GROUP BY artist.name ORDER BY numero_generos DESC LIMIT 5"
+    postgreSQL_select_Query = querry8
+    cursor.execute(postgreSQL_select_Query)
+    records8 = cursor.fetchall()
+    palabra = ""
+    for record in records8:
+        print(record[0],record[1])
+        numero = str(record[1])
+        palabra = palabra +record[0]+" "+numero +" minutos\n"
+        print(type(record))
+
+    print(palabra)
+    records8=Label(reportes_screen, text=palabra, fg = 'white', bg='black')
+    records8.place(x=1150, y=425)
 
 
 def searchmusic ():
